@@ -5,15 +5,7 @@ const cardTeacher = document.getElementById("cardTeachers");
 const templateStudent = document.getElementById("templateStudents").content;
 const templateTeacher = document.getElementById("templateTeachers").content;
 
-// Event Delegation
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  const inputs = new FormData(form);
-  const [name, age, option] = [...inputs.values()]; //Destructuring array (...rest)
-  //inputs.forEach((item) => console.log(item));
-  console.log(name, age, option);
-});
+const studentsArray = [];
 
 // CONSTRUCTION FUNCTION (class Person)
 class Person {
@@ -26,15 +18,18 @@ class Person {
     if (type === "Student") {
       cardStudent.textContent = "";
       const fragment = new DocumentFragment();
+
       person.forEach((item) => {
-        fragment.append(item.addNewStudent);
+        fragment.append(item.addNewStudent());
       });
+
       cardStudent.append(fragment);
     }
   }
 }
 
-class Student extends Person {
+// CONSTRUCTION FUNCTION (class Students)
+class Students extends Person {
   #state = false;
   #student = "Student";
 
@@ -47,14 +42,49 @@ class Student extends Person {
   }
 
   addNewStudent() {
-    const clone = templateStudent.clonNode();
+    const clone = templateStudent.cloneNode(true);
+
     clone.querySelector("h5 .text-primary").textContent = this.name;
+    clone.querySelector(".lead").textContent = this.age;
 
     return clone;
   }
 }
 
-class Teacher extends Person {}
+// CONSTRUCTION FUNCTION (class Teacher)
+class Teacher extends Person {
+  #teacher = "Teacher";
+
+  addNewTeacher() {
+    const clone = templateTeacher.cloneNode(true);
+
+    clone.querySelector("h5").textContent = this.name;
+    clone.querySelector("h6").textContent = this.#teacher;
+    clone.querySelector("p .lead").textContent = this.age;
+    return clone;
+  }
+}
+
+// Event Delegation
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const inputs = new FormData(form);
+  const [name, age, option] = [...inputs.values()]; //Destructuring array (...rest)
+  //inputs.forEach((item) => console.log(item));
+
+  if (option === "Student") {
+    const student = new Students(name, age);
+    studentsArray.push(student);
+    Person.printPersonUI(studentsArray, option);
+  }
+
+  if (option === "Teacher") {
+    console.log("Teacher Here!");
+  }
+
+  console.log(studentsArray);
+});
 
 // // CONSTRUCTOR FUNCTION (Prototype)
 // function Person(name) {
