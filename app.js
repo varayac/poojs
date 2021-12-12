@@ -6,6 +6,7 @@ const templateStudent = document.getElementById("templateStudents").content;
 const templateTeacher = document.getElementById("templateTeachers").content;
 
 const studentsArray = [];
+const teacherArray = [];
 
 // CONSTRUCTION FUNCTION (class Person)
 class Person {
@@ -24,6 +25,17 @@ class Person {
       });
 
       cardStudent.append(fragment);
+    }
+
+    if (type === "Teacher") {
+      cardTeacher.textContent = "";
+      const fragment = new DocumentFragment();
+
+      person.forEach((item) => {
+        fragment.append(item.addNewTeacher());
+      });
+
+      cardTeacher.append(fragment);
     }
   }
 }
@@ -45,7 +57,25 @@ class Students extends Person {
     const clone = templateStudent.cloneNode(true);
 
     clone.querySelector("h5 .text-primary").textContent = this.name;
+    clone.querySelector("h6").textContent = this.getStudent;
     clone.querySelector(".lead").textContent = this.age;
+
+    if (this.#state) {
+      clone.querySelector(".badge").className = "badge bg-success";
+      clone.querySelector(".btn-success").disabled = true;
+      clone.querySelector(".btn-danger").disabled = false;
+    } else {
+      clone.querySelector(".badge").className = "badge bg-danger";
+      clone.querySelector(".btn-danger").disabled = true;
+      clone.querySelector(".btn-success").disabled = false;
+    }
+
+    clone.querySelector(".badge").textContent = this.#state
+      ? "Approved"
+      : "Failed";
+
+    clone.querySelector(".btn-success").dataset.name = this.name;
+    clone.querySelector(".btn-danger").dataset.name = this.name;
 
     return clone;
   }
@@ -60,12 +90,12 @@ class Teacher extends Person {
 
     clone.querySelector("h5").textContent = this.name;
     clone.querySelector("h6").textContent = this.#teacher;
-    clone.querySelector("p .lead").textContent = this.age;
+    clone.querySelector(".lead").textContent = this.age;
     return clone;
   }
 }
 
-// Event Delegation
+// Event Delegation Form
 form.addEventListener("submit", (e) => {
   e.preventDefault();
 
@@ -80,10 +110,39 @@ form.addEventListener("submit", (e) => {
   }
 
   if (option === "Teacher") {
-    console.log("Teacher Here!");
+    const teacher = new Teacher(name, age);
+    teacherArray.push(teacher);
+    Person.printPersonUI(teacherArray, option);
   }
 
   console.log(studentsArray);
+});
+
+// Event Delegation Document (Buttons)
+document.addEventListener("click", (e) => {
+  if (e.target.dataset.name) {
+    if (e.target.matches(".btn-success")) {
+      studentsArray.map((item) => {
+        if (item.name === e.target.dataset.name) {
+          item.setState = true;
+        }
+        console.log(item);
+        return item;
+      });
+    }
+
+    if (e.target.matches(".btn-danger")) {
+      studentsArray.map((item) => {
+        if (item.name === e.target.dataset.name) {
+          item.setState = false;
+        }
+        console.log(item);
+        return item;
+      });
+    }
+
+    Person.printPersonUI(studentsArray, "Student");
+  }
 });
 
 // // CONSTRUCTOR FUNCTION (Prototype)
