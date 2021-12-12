@@ -4,6 +4,7 @@ const cardStudent = document.getElementById("cardStudents");
 const cardTeacher = document.getElementById("cardTeachers");
 const templateStudent = document.getElementById("templateStudents").content;
 const templateTeacher = document.getElementById("templateTeachers").content;
+const alert = document.querySelector(".alert");
 
 const studentsArray = [];
 const teacherArray = [];
@@ -13,6 +14,7 @@ class Person {
   constructor(name, age) {
     this.name = name;
     this.age = age;
+    this.uid = `${Date.now()}`;
   }
 
   static printPersonUI(person, type) {
@@ -74,8 +76,8 @@ class Students extends Person {
       ? "Approved"
       : "Failed";
 
-    clone.querySelector(".btn-success").dataset.name = this.name;
-    clone.querySelector(".btn-danger").dataset.name = this.name;
+    clone.querySelector(".btn-success").dataset.uid = this.uid;
+    clone.querySelector(".btn-danger").dataset.uid = this.uid;
 
     return clone;
   }
@@ -103,6 +105,12 @@ form.addEventListener("submit", (e) => {
   const [name, age, option] = [...inputs.values()]; //Destructuring array (...rest)
   //inputs.forEach((item) => console.log(item));
 
+  if (!name.trim() || !age.trim() || !option.trim()) {
+    console.log("algun dato?");
+    alert.classList.remove("d-none");
+    return;
+  }
+
   if (option === "Student") {
     const student = new Students(name, age);
     studentsArray.push(student);
@@ -120,10 +128,10 @@ form.addEventListener("submit", (e) => {
 
 // Event Delegation Document (Buttons)
 document.addEventListener("click", (e) => {
-  if (e.target.dataset.name) {
+  if (e.target.dataset.uid) {
     if (e.target.matches(".btn-success")) {
       studentsArray.map((item) => {
-        if (item.name === e.target.dataset.name) {
+        if (item.uid === e.target.dataset.uid) {
           item.setState = true;
         }
         console.log(item);
@@ -133,7 +141,7 @@ document.addEventListener("click", (e) => {
 
     if (e.target.matches(".btn-danger")) {
       studentsArray.map((item) => {
-        if (item.name === e.target.dataset.name) {
+        if (item.uid === e.target.dataset.uid) {
           item.setState = false;
         }
         console.log(item);
